@@ -188,3 +188,8 @@ BisonBotKit includes a powerful logging system with the following features:
 ## License
 
 bisonbotkit is licensed under the [copyfree](http://copyfree.org) ISC License.
+
+## Contributors
+
+- [dajohi](https://github.com/dajohi) 
+- [vctt94](https://github.com/vctt94)
