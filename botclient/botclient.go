@@ -28,8 +28,8 @@ func NewClient(cfg *config.ClientConfig, logBackend *logging.LogBackend) (*BotCl
 	// Create JSON-RPC client
 	rpcClient, err := jsonrpc.NewWSClient(
 		jsonrpc.WithWebsocketURL(cfg.RPCURL),
-		jsonrpc.WithServerTLSCertPath(cfg.ServerCertPath),
-		jsonrpc.WithClientTLSCert(cfg.ClientCertPath, cfg.ClientKeyPath),
+		jsonrpc.WithServerTLSCertPath(cfg.BRClientCert),
+		jsonrpc.WithClientTLSCert(cfg.BRClientRPCCert, cfg.BRClientRPCKey),
 		jsonrpc.WithClientLog(log),
 		jsonrpc.WithClientBasicAuth(cfg.RPCUser, cfg.RPCPass),
 	)

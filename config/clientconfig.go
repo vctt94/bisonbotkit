@@ -16,14 +16,14 @@ var (
 
 // ClientConfig holds all configuration options for a Bison Relay client
 type ClientConfig struct {
-	ServerAddr     string
-	RPCURL         string
-	ServerCertPath string
-	ClientCertPath string
-	ClientKeyPath  string
-	GRPCServerCert string
-	RPCUser        string
-	RPCPass        string
+	ServerAddr      string
+	RPCURL          string
+	BRClientCert    string
+	BRClientRPCCert string
+	BRClientRPCKey  string
+	GRPCServerCert  string
+	RPCUser         string
+	RPCPass         string
 	// Logging-related fields
 	LogFile        string // Path to the log file
 	Debug          string // Debug level string
@@ -36,9 +36,9 @@ func writeClientConfigFile(cfg *ClientConfig, configPath string) error {
 	configData := fmt.Sprintf(
 		`serveraddr=%s
 rpcurl=%s
-servercertpath=%s
-clientcertpath=%s
-clientkeypath=%s
+brclientcert=%s
+brclientrpccert=%s
+brclientrpckey=%s
 grpcservercert=%s
 rpcuser=%s
 rpcpass=%s
@@ -49,9 +49,9 @@ maxbufferlines=%d
 `,
 		cfg.ServerAddr,
 		cfg.RPCURL,
-		cfg.ServerCertPath,
-		cfg.ClientCertPath,
-		cfg.ClientKeyPath,
+		cfg.BRClientCert,
+		cfg.BRClientRPCCert,
+		cfg.BRClientRPCKey,
 		cfg.GRPCServerCert,
 		cfg.RPCUser,
 		cfg.RPCPass,
@@ -89,12 +89,12 @@ func parseClientConfigFile(configPath string) (*ClientConfig, error) {
 			cfg.ServerAddr = value
 		case "rpcurl":
 			cfg.RPCURL = value
-		case "servercertpath":
-			cfg.ServerCertPath = value
-		case "clientcertpath":
-			cfg.ClientCertPath = value
-		case "clientkeypath":
-			cfg.ClientKeyPath = value
+		case "brclientcert":
+			cfg.BRClientCert = value
+		case "brclientrpccert":
+			cfg.BRClientRPCCert = value
+		case "brclientrpckey":
+			cfg.BRClientCert = value
 		case "grpcservercert":
 			cfg.GRPCServerCert = value
 		case "rpcuser":
@@ -148,18 +148,18 @@ func LoadClientConfig(configPath string, fileName string) (*ClientConfig, error)
 	}
 	// Create default config
 	cfg := &ClientConfig{
-		ServerAddr:     "127.0.0.1:9100",
-		RPCURL:         "wss://127.0.0.1:9754/ws",
-		ServerCertPath: filepath.Join(configPath, "server.cert"),
-		ClientCertPath: filepath.Join(defaultBRClientDir, "rpc-client.cert"),
-		ClientKeyPath:  filepath.Join(defaultBRClientDir, "rpc-client.key"),
-		GRPCServerCert: filepath.Join(configPath, "server.cert"),
-		RPCUser:        rpcUser,
-		RPCPass:        rpcPass,
-		LogFile:        filepath.Join(configPath, "logs", fileName),
-		Debug:          "info",
-		MaxLogFiles:    5,
-		MaxBufferLines: 1000,
+		ServerAddr:      "127.0.0.1:50051",
+		RPCURL:          "wss://127.0.0.1:7676/ws",
+		BRClientCert:    filepath.Join(defaultBRClientDir, "rpc.cert"),
+		BRClientRPCCert: filepath.Join(defaultBRClientDir, "rpc-client.cert"),
+		BRClientRPCKey:  filepath.Join(defaultBRClientDir, "rpc-client.key"),
+		GRPCServerCert:  filepath.Join(configPath, "server.cert"),
+		RPCUser:         rpcUser,
+		RPCPass:         rpcPass,
+		LogFile:         filepath.Join(configPath, "logs", fileName),
+		Debug:           "info",
+		MaxLogFiles:     5,
+		MaxBufferLines:  1000,
 	}
 
 	// Write default config
