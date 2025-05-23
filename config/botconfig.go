@@ -168,6 +168,14 @@ func parseConfigFile(configPath string) (*BotConfig, error) {
 
 // LoadBotConfig attempts to load the bot config from the default locations.
 func LoadBotConfig(configPath string, fileName string) (*BotConfig, error) {
+	// Check if fileName has .conf extension
+	if !strings.HasSuffix(fileName, ".conf") {
+		return nil, fmt.Errorf("filename must have .conf extension, got: %s", fileName)
+	}
+
+	// Get app name by removing .conf extension
+	appName := strings.TrimSuffix(fileName, ".conf")
+
 	defaultConfigPath := utils.AppDataDir(fileName, false)
 	configPath = utils.CleanAndExpandPath(configPath)
 	// If configPath is empty, use defaultConfigPath
@@ -208,7 +216,7 @@ func LoadBotConfig(configPath string, fileName string) (*BotConfig, error) {
 		RPCUser:        rpcUser,
 		RPCPass:        rpcPass,
 		Debug:          "info",
-		LogFile:        filepath.Join(configPath, "logs", "chatbot.log"),
+		LogFile:        filepath.Join(configPath, "logs", appName+".log"),
 		MaxLogFiles:    5,
 		MaxBufferLines: 1000,
 		ExtraConfig:    make(map[string]string), // Initialize the map for new configs

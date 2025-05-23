@@ -119,8 +119,16 @@ func parseClientConfigFile(configPath string) (*ClientConfig, error) {
 	return cfg, nil
 }
 
-// LoadClientConfig attempts to load the client config from the default locations.
+// LoadClientConfig attempts to load the client config (.conf) from the default locations.
 func LoadClientConfig(configPath string, fileName string) (*ClientConfig, error) {
+	// Check if fileName has .conf extension
+	if !strings.HasSuffix(fileName, ".conf") {
+		return nil, fmt.Errorf("filename must have .conf extension, got: %s", fileName)
+	}
+
+	// Get app name by removing .conf extension
+	appName := strings.TrimSuffix(fileName, ".conf")
+
 	defaultConfigPath := utils.AppDataDir(fileName, false)
 	// If configPath is empty, use defaultConfigPath
 	if configPath == "" {
@@ -156,7 +164,7 @@ func LoadClientConfig(configPath string, fileName string) (*ClientConfig, error)
 		GRPCServerCert:  filepath.Join(configPath, "server.cert"),
 		RPCUser:         rpcUser,
 		RPCPass:         rpcPass,
-		LogFile:         filepath.Join(configPath, "logs", fileName),
+		LogFile:         filepath.Join(configPath, "logs", appName+".log"),
 		Debug:           "info",
 		MaxLogFiles:     5,
 		MaxBufferLines:  1000,
