@@ -158,7 +158,9 @@ func NewBot(cfg *config.BotConfig) (*Bot, error) {
 	}()
 
 	return &Bot{
-		cfg: cfg,
+		cfg:        cfg,
+		LogBackend: logBackend,
+
 		wsc: wsc,
 		ctx: ctx,
 
