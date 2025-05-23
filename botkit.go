@@ -20,6 +20,9 @@ func (b *Bot) Run(ctx context.Context) error {
 	g, gctx := errgroup.WithContext(ctx)
 
 	if b.gcChan != nil {
+		if b.gcLog == nil {
+			b.gcLog = b.LogBackend.Logger("GC")
+		}
 		g.Go(func() error {
 			return b.gcNtfns(gctx)
 		})
@@ -32,36 +35,54 @@ func (b *Bot) Run(ctx context.Context) error {
 	}
 
 	if b.pmChan != nil {
+		if b.pmLog == nil {
+			b.pmLog = b.LogBackend.Logger("PM")
+		}
 		g.Go(func() error {
 			return b.pmNtfns(gctx)
 		})
 	}
 
 	if b.kxChan != nil {
+		if b.kxLog == nil {
+			b.kxLog = b.LogBackend.Logger("KX")
+		}
 		g.Go(func() error {
 			return b.kxNtfns(gctx)
 		})
 	}
 
 	if b.postChan != nil {
+		if b.postLog == nil {
+			b.postLog = b.LogBackend.Logger("POST")
+		}
 		g.Go(func() error {
 			return b.postNtfns(gctx)
 		})
 	}
 
 	if b.postStatusChan != nil {
+		if b.postStatusLog == nil {
+			b.postStatusLog = b.LogBackend.Logger("POST_STATUS")
+		}
 		g.Go(func() error {
 			return b.postStatusNtfns(gctx)
 		})
 	}
 
 	if b.tipProgressChan != nil {
+		if b.tipProgressLog == nil {
+			b.tipProgressLog = b.LogBackend.Logger("TIP_PROGRESS")
+		}
 		g.Go(func() error {
 			return b.tipProgress(gctx)
 		})
 	}
 
 	if b.tipReceivedChan != nil {
+		if b.tipReceivedLog == nil {
+			b.tipReceivedLog = b.LogBackend.Logger("TIP_RECEIVED")
+		}
 		g.Go(func() error {
 			return b.tipReceived(gctx)
 		})
