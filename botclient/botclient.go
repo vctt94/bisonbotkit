@@ -23,6 +23,30 @@ type BotClient struct {
 
 // NewClient creates a new BisonRelay client
 func NewClient(cfg *config.ClientConfig) (*BotClient, error) {
+	// Sanity check: validate config is not nil
+	if cfg == nil {
+		return nil, fmt.Errorf("client config cannot be nil")
+	}
+
+	// Validate required configuration items for logging
+	if cfg.LogFile == "" {
+		return nil, fmt.Errorf("LogFile is required in client configuration")
+	}
+	if cfg.MaxLogFiles <= 0 {
+		cfg.MaxLogFiles = 5 // Set reasonable default
+	}
+	if cfg.MaxBufferLines <= 0 {
+		cfg.MaxBufferLines = 1000 // Set reasonable default
+	}
+	if cfg.Debug == "" {
+		cfg.Debug = "info" // Set reasonable default
+	}
+
+	// Validate other required fields
+	if cfg.RPCURL == "" {
+		return nil, fmt.Errorf("RPCURL is required in client configuration")
+	}
+
 	// Create log backend
 	logBackend, err := logging.NewLogBackend(logging.LogConfig{
 		LogFile:        cfg.LogFile,
@@ -32,6 +56,11 @@ func NewClient(cfg *config.ClientConfig) (*BotClient, error) {
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to set up logging: %v", err)
+	}
+
+	// Additional sanity check: ensure LogBackend was actually created
+	if logBackend == nil {
+		return nil, fmt.Errorf("failed to create log backend: received nil LogBackend")
 	}
 
 	// Get logger from the backend

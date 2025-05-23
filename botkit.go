@@ -87,6 +87,33 @@ func NewJSONRPCClient(cfg *config.BotConfig, log slog.Logger) (*jsonrpc.WSClient
 // It initializes the RPC client and sets up chat and payment service clients.
 // Returns an error if the RPC client initialization fails.
 func NewBot(cfg *config.BotConfig) (*Bot, error) {
+	// Sanity check: validate config is not nil
+	if cfg == nil {
+		return nil, fmt.Errorf("bot config cannot be nil")
+	}
+
+	// Validate required configuration items for logging
+	if cfg.LogFile == "" {
+		return nil, fmt.Errorf("LogFile is required in bot configuration")
+	}
+	if cfg.MaxLogFiles <= 0 {
+		cfg.MaxLogFiles = 5 // Set reasonable default
+	}
+	if cfg.MaxBufferLines <= 0 {
+		cfg.MaxBufferLines = 1000 // Set reasonable default
+	}
+	if cfg.Debug == "" {
+		cfg.Debug = "info" // Set reasonable default
+	}
+
+	// Validate other required fields
+	if cfg.RPCURL == "" {
+		return nil, fmt.Errorf("RPCURL is required in bot configuration")
+	}
+	if cfg.DataDir == "" {
+		return nil, fmt.Errorf("DataDir is required in bot configuration")
+	}
+
 	// Create log backend
 	logBackend, err := logging.NewLogBackend(logging.LogConfig{
 		LogFile:        cfg.LogFile,
@@ -96,6 +123,11 @@ func NewBot(cfg *config.BotConfig) (*Bot, error) {
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to set up logging: %v", err)
+	}
+
+	// Additional sanity check: ensure LogBackend was actually created
+	if logBackend == nil {
+		return nil, fmt.Errorf("failed to create log backend: received nil LogBackend")
 	}
 
 	wsc, err := NewJSONRPCClient(cfg, logBackend.Logger("RPC"))
