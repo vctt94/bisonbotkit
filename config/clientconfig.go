@@ -94,7 +94,7 @@ func parseClientConfigFile(configPath string) (*ClientConfig, error) {
 		case "brclientrpccert":
 			cfg.BRClientRPCCert = value
 		case "brclientrpckey":
-			cfg.BRClientCert = value
+			cfg.BRClientRPCKey = value
 		case "grpcservercert":
 			cfg.GRPCServerCert = value
 		case "rpcuser":
