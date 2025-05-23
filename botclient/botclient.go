@@ -2,6 +2,7 @@ package botclient
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/companyzero/bisonrelay/clientrpc/jsonrpc"
 	"github.com/companyzero/bisonrelay/clientrpc/types"
@@ -21,7 +22,18 @@ type BotClient struct {
 }
 
 // NewClient creates a new BisonRelay client
-func NewClient(cfg *config.ClientConfig, logBackend *logging.LogBackend) (*BotClient, error) {
+func NewClient(cfg *config.ClientConfig) (*BotClient, error) {
+	// Create log backend
+	logBackend, err := logging.NewLogBackend(logging.LogConfig{
+		LogFile:        cfg.LogFile,
+		DebugLevel:     cfg.Debug,
+		MaxLogFiles:    cfg.MaxLogFiles,
+		MaxBufferLines: cfg.MaxBufferLines,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to set up logging: %v", err)
+	}
+
 	// Get logger from the backend
 	log := logBackend.Logger("client")
 

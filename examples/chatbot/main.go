@@ -7,14 +7,12 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"strings"
 	"syscall"
 
 	"github.com/companyzero/bisonrelay/clientrpc/types"
 	kit "github.com/vctt94/bisonbotkit"
 	"github.com/vctt94/bisonbotkit/config"
-	"github.com/vctt94/bisonbotkit/logging"
 )
 
 var (
@@ -23,21 +21,6 @@ var (
 
 func realMain() error {
 	flag.Parse()
-
-	// Initialize logging
-	logBackend, err := logging.NewLogBackend(logging.LogConfig{
-		LogFile:        filepath.Join(*flagAppRoot, "logs", "chatbot.log"),
-		DebugLevel:     "info",
-		MaxLogFiles:    5,
-		MaxBufferLines: 1000,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to initialize logging: %v", err)
-	}
-	defer logBackend.Close()
-
-	// Get a logger for the application
-	log := logBackend.Logger("ChatBot")
 
 	// Load bot configuration
 	cfg, err := config.LoadBotConfig(*flagAppRoot, "chatbot.conf")
@@ -49,13 +32,15 @@ func realMain() error {
 	pmChan := make(chan types.ReceivedPM)
 	// Assign the send side to the config
 	cfg.PMChan = pmChan
-	cfg.PMLog = logBackend.Logger("PM")
+	// Note: PMLog will be created internally by NewBot
 
 	// Create new bot instance
-	bot, err := kit.NewBot(cfg, logBackend)
+	bot, err := kit.NewBot(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to create bot: %v", err)
 	}
+	log := bot.LogBackend.Logger("ChatBot")
+	cfg.PMLog = bot.LogBackend.Logger("PM")
 
 	// Add a goroutine to handle PMs using our bidirectional channel
 	go func() {

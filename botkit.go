@@ -4,6 +4,7 @@ package bisonbotkit
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -85,7 +86,18 @@ func NewJSONRPCClient(cfg *config.BotConfig, log slog.Logger) (*jsonrpc.WSClient
 // NewBot creates a new Bot instance with the provided configuration and logging backend.
 // It initializes the RPC client and sets up chat and payment service clients.
 // Returns an error if the RPC client initialization fails.
-func NewBot(cfg *config.BotConfig, logBackend *logging.LogBackend) (*Bot, error) {
+func NewBot(cfg *config.BotConfig) (*Bot, error) {
+	// Create log backend
+	logBackend, err := logging.NewLogBackend(logging.LogConfig{
+		LogFile:        cfg.LogFile,
+		DebugLevel:     cfg.Debug,
+		MaxLogFiles:    cfg.MaxLogFiles,
+		MaxBufferLines: cfg.MaxBufferLines,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to set up logging: %v", err)
+	}
+
 	wsc, err := NewJSONRPCClient(cfg, logBackend.Logger("RPC"))
 	if err != nil {
 		return nil, err

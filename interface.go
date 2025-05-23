@@ -8,6 +8,7 @@ import (
 	"github.com/companyzero/bisonrelay/clientrpc/types"
 	"github.com/decred/slog"
 	"github.com/vctt94/bisonbotkit/config"
+	"github.com/vctt94/bisonbotkit/logging"
 )
 
 // Bot represents a BisonRelay bot instance with configuration, RPC clients,
@@ -15,6 +16,8 @@ import (
 type Bot struct {
 	// Cfg holds the bot's configuration settings
 	cfg *config.BotConfig
+
+	LogBackend *logging.LogBackend
 
 	wsc *jsonrpc.WSClient
 	ctx context.Context

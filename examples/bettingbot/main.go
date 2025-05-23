@@ -7,7 +7,6 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
@@ -17,7 +16,6 @@ import (
 	"github.com/decred/dcrd/dcrutil/v4"
 	kit "github.com/vctt94/bisonbotkit"
 	"github.com/vctt94/bisonbotkit/config"
-	"github.com/vctt94/bisonbotkit/logging"
 	"github.com/vctt94/bisonbotkit/utils"
 )
 
@@ -114,25 +112,6 @@ func realMain() error {
 	// Expand and clean the app root path
 	appRoot := utils.CleanAndExpandPath(*flagAppRoot)
 
-	// Ensure the log directory exists
-	logDir := filepath.Join(appRoot, "logs")
-	if err := os.MkdirAll(logDir, 0700); err != nil {
-		return fmt.Errorf("failed to create log directory: %v", err)
-	}
-
-	// Initialize logging
-	logBackend, err := logging.NewLogBackend(logging.LogConfig{
-		LogFile:     filepath.Join(logDir, "bettingbot.log"),
-		DebugLevel:  "info",
-		MaxLogFiles: 5,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to initialize logging: %v", err)
-	}
-	defer logBackend.Close()
-
-	log := logBackend.Logger("BettingBot")
-
 	// Load bot configuration
 	cfg, err := config.LoadBotConfig(appRoot, "bettingbot.conf")
 	if err != nil {
@@ -144,21 +123,23 @@ func realMain() error {
 	tipChan := make(chan types.ReceivedTip)
 	tipProgressChan := make(chan types.TipProgressEvent)
 
-	// Set up PM channel and log
+	// Set up PM channel
 	cfg.PMChan = pmChan
-	cfg.PMLog = logBackend.Logger("PM")
 
-	// Set up tip channels/logs
-	cfg.TipLog = logBackend.Logger("TIP")
+	// Set up tip channels
 	cfg.TipProgressChan = tipProgressChan
-	cfg.TipReceivedLog = logBackend.Logger("TIP_RECEIVED")
 	cfg.TipReceivedChan = tipChan
 
 	// Create the bot
-	bot, err := kit.NewBot(cfg, logBackend)
+	bot, err := kit.NewBot(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to create bot: %v", err)
 	}
+
+	log := bot.LogBackend.Logger("BettingBot")
+	cfg.PMLog = bot.LogBackend.Logger("PM")
+	cfg.TipLog = bot.LogBackend.Logger("TIP")
+	cfg.TipReceivedLog = bot.LogBackend.Logger("TIP_RECEIVED")
 
 	// Set up context with cancellation
 	ctx, cancel := context.WithCancel(context.Background())
