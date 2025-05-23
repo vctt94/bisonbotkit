@@ -70,5 +70,11 @@ func (g GCs) Swap(a, b int) {
 }
 
 func (b *Bot) Close() error {
+	if b.LogBackend != nil {
+		err := b.LogBackend.Close()
+		if err != nil {
+			return err
+		}
+	}
 	return b.wsc.Close()
 }
