@@ -20,7 +20,6 @@ type ClientConfig struct {
 	BRClientCert    string
 	BRClientRPCCert string
 	BRClientRPCKey  string
-	GRPCServerCert  string
 	RPCUser         string
 	RPCPass         string
 	// Logging-related fields
@@ -44,8 +43,6 @@ func (c *ClientConfig) GetString(key string) string {
 		return c.BRClientRPCCert
 	case "brclientrpckey":
 		return c.BRClientRPCKey
-	case "grpcservercert":
-		return c.GRPCServerCert
 	case "rpcuser":
 		return c.RPCUser
 	case "rpcpass":
@@ -73,8 +70,6 @@ func (c *ClientConfig) SetString(key, value string) {
 		c.BRClientRPCCert = value
 	case "brclientrpckey":
 		c.BRClientRPCKey = value
-	case "grpcservercert":
-		c.GRPCServerCert = value
 	case "rpcuser":
 		c.RPCUser = value
 	case "rpcpass":
@@ -132,7 +127,6 @@ func writeClientConfigFile(cfg *ClientConfig, configPath string) error {
 brclientcert=%s
 brclientrpccert=%s
 brclientrpckey=%s
-grpcservercert=%s
 rpcuser=%s
 rpcpass=%s
 logfile=%s
@@ -144,7 +138,6 @@ maxbufferlines=%d
 		cfg.BRClientCert,
 		cfg.BRClientRPCCert,
 		cfg.BRClientRPCKey,
-		cfg.GRPCServerCert,
 		cfg.RPCUser,
 		cfg.RPCPass,
 		cfg.LogFile,
