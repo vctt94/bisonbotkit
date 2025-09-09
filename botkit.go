@@ -129,10 +129,10 @@ func NewBot(cfg *config.BotConfig) (*Bot, error) {
 
 	// Validate other required fields
 	if cfg.RPCURL == "" {
-		return nil, fmt.Errorf("RPCURL is required in bot configuration")
+		return nil, fmt.Errorf("brrpcurl is required in bot configuration")
 	}
 	if cfg.DataDir == "" {
-		return nil, fmt.Errorf("DataDir is required in bot configuration")
+		return nil, fmt.Errorf("datadir is required in bot configuration")
 	}
 
 	// Create log backend

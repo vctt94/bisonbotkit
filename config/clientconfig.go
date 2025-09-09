@@ -22,6 +22,7 @@ type ClientConfig struct {
 	BRClientRPCKey  string
 	RPCUser         string
 	RPCPass         string
+	AuthMode        string
 	// Logging-related fields
 	LogFile        string // Path to the log file
 	Debug          string // Debug level string
@@ -35,7 +36,7 @@ type ClientConfig struct {
 // GetString gets a configuration value as string, checking extra config first
 func (c *ClientConfig) GetString(key string) string {
 	switch key {
-	case "rpcurl":
+	case "brrpcurl":
 		return c.RPCURL
 	case "brclientcert":
 		return c.BRClientCert
@@ -47,6 +48,8 @@ func (c *ClientConfig) GetString(key string) string {
 		return c.RPCUser
 	case "rpcpass":
 		return c.RPCPass
+	case "authmode":
+		return c.AuthMode
 	case "logfile":
 		return c.LogFile
 	case "debug":
@@ -62,7 +65,7 @@ func (c *ClientConfig) GetString(key string) string {
 // SetString sets a configuration value as string
 func (c *ClientConfig) SetString(key, value string) {
 	switch key {
-	case "rpcurl":
+	case "brrpcurl":
 		c.RPCURL = value
 	case "brclientcert":
 		c.BRClientCert = value
@@ -74,6 +77,8 @@ func (c *ClientConfig) SetString(key, value string) {
 		c.RPCUser = value
 	case "rpcpass":
 		c.RPCPass = value
+	case "authmode":
+		c.AuthMode = value
 	case "logfile":
 		c.LogFile = value
 	case "debug":
@@ -123,12 +128,13 @@ func (c *ClientConfig) SetInt(key string, value int) {
 // Write the configuration to a file.
 func writeClientConfigFile(cfg *ClientConfig, configPath string) error {
 	configData := fmt.Sprintf(
-		`rpcurl=%s
+		`brrpcurl=%s
 brclientcert=%s
 brclientrpccert=%s
 brclientrpckey=%s
 rpcuser=%s
 rpcpass=%s
+authmode=%s
 logfile=%s
 debug=%s
 maxlogfiles=%d
@@ -140,6 +146,7 @@ maxbufferlines=%d
 		cfg.BRClientRPCKey,
 		cfg.RPCUser,
 		cfg.RPCPass,
+		cfg.AuthMode,
 		cfg.LogFile,
 		cfg.Debug,
 		cfg.MaxLogFiles,
@@ -181,7 +188,7 @@ func parseClientConfigFile(configPath string) (*ClientConfig, error) {
 		value := strings.TrimSpace(parts[1])
 
 		switch key {
-		case "rpcurl":
+		case "brrpcurl":
 			cfg.RPCURL = value
 		case "brclientcert":
 			cfg.BRClientCert = value
@@ -193,6 +200,8 @@ func parseClientConfigFile(configPath string) (*ClientConfig, error) {
 			cfg.RPCUser = value
 		case "rpcpass":
 			cfg.RPCPass = value
+		case "authmode":
+			cfg.AuthMode = value
 		case "logfile":
 			cfg.LogFile = value
 		case "debug":
@@ -208,6 +217,41 @@ func parseClientConfigFile(configPath string) (*ClientConfig, error) {
 
 	if err := scanner.Err(); err != nil {
 		return nil, err
+	}
+
+	// Validate required fields are present and accessible
+	var missing []string
+	if cfg.RPCURL == "" {
+		missing = append(missing, "brrpcurl")
+	}
+	if cfg.BRClientCert == "" {
+		missing = append(missing, "brclientcert")
+	}
+	if cfg.BRClientRPCCert == "" {
+		missing = append(missing, "brclientrpccert")
+	}
+	if cfg.BRClientRPCKey == "" {
+		missing = append(missing, "brclientrpckey")
+	}
+	if cfg.RPCUser == "" {
+		missing = append(missing, "rpcuser")
+	}
+	if cfg.RPCPass == "" {
+		missing = append(missing, "rpcpass")
+	}
+	if len(missing) > 0 {
+		return nil, fmt.Errorf("missing required fields in client config: %s", strings.Join(missing, ", "))
+	}
+
+	// Ensure cert/key files exist so we fail fast with a clear error
+	for _, fp := range []struct{ name, path string }{
+		{"brclientcert", cfg.BRClientCert},
+		{"brclientrpccert", cfg.BRClientRPCCert},
+		{"brclientrpckey", cfg.BRClientRPCKey},
+	} {
+		if _, err := os.Stat(fp.path); err != nil {
+			return nil, fmt.Errorf("%s file not accessible at %q: %v", fp.name, fp.path, err)
+		}
 	}
 
 	return cfg, nil
@@ -257,6 +301,7 @@ func LoadClientConfig(configPath string, fileName string) (*ClientConfig, error)
 		BRClientRPCKey:  filepath.Join(defaultBRDir, "rpc-client.key"),
 		RPCUser:         rpcUser,
 		RPCPass:         rpcPass,
+		AuthMode:        "basic",
 		LogFile:         filepath.Join(configPath, "logs", appName+".log"),
 		Debug:           "info",
 		MaxLogFiles:     5,

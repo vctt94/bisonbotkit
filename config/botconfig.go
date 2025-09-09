@@ -65,7 +65,7 @@ func writeConfigFile(cfg *BotConfig, configPath string) error {
 	// Build the basic config string with known fields
 	configData := fmt.Sprintf(
 		`datadir=%s
-rpcurl=%s
+brrpcurl=%s
 servercertpath=%s
 clientcertpath=%s
 clientkeypath=%s
@@ -129,7 +129,7 @@ func parseConfigFile(configPath string) (*BotConfig, error) {
 		switch key {
 		case "datadir":
 			cfg.DataDir = value
-		case "rpcurl":
+		case "brrpcurl":
 			cfg.RPCURL = value
 		case "servercertpath":
 			cfg.ServerCertPath = value

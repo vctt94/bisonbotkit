@@ -3,6 +3,7 @@ package botclient
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/companyzero/bisonrelay/clientrpc/jsonrpc"
 	"github.com/companyzero/bisonrelay/clientrpc/types"
@@ -45,6 +46,26 @@ func NewClient(cfg *config.ClientConfig) (*BotClient, error) {
 	// Validate other required fields
 	if cfg.RPCURL == "" {
 		return nil, fmt.Errorf("RPCURL is required in client configuration")
+	}
+
+	// Validate TLS cert configuration early to avoid opaque TLS errors later
+	if cfg.BRClientCert == "" {
+		return nil, fmt.Errorf("brclientcert is required in client configuration")
+	}
+	if cfg.BRClientRPCCert == "" {
+		return nil, fmt.Errorf("brclientrpccert is required in client configuration")
+	}
+	if cfg.BRClientRPCKey == "" {
+		return nil, fmt.Errorf("brclientrpckey is required in client configuration")
+	}
+	for _, fp := range []struct{ name, path string }{
+		{"brclientcert", cfg.BRClientCert},
+		{"brclientrpccert", cfg.BRClientRPCCert},
+		{"brclientrpckey", cfg.BRClientRPCKey},
+	} {
+		if _, err := os.Stat(fp.path); err != nil {
+			return nil, fmt.Errorf("%s file not accessible at %q: %v", fp.name, fp.path, err)
+		}
 	}
 
 	// Create log backend
