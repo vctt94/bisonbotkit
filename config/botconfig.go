@@ -26,26 +26,26 @@ type BotConfig struct {
 	ClientCertPath string
 	ClientKeyPath  string
 
-	GCChan     chan<- types.GCReceivedMsg
+	GCChan     chan<- *types.GCReceivedMsg
 	GCLog      slog.Logger
-	InviteChan chan<- types.ReceivedGCInvite
+	InviteChan chan<- *types.ReceivedGCInvite
 
-	PMChan chan<- types.ReceivedPM
+	PMChan chan<- *types.ReceivedPM
 	PMLog  slog.Logger
 
-	PostChan chan<- types.ReceivedPost
+	PostChan chan<- *types.ReceivedPost
 	PostLog  slog.Logger
 
-	PostStatusChan chan<- types.ReceivedPostStatus
+	PostStatusChan chan<- *types.ReceivedPostStatus
 	PostStatusLog  slog.Logger
 
-	TipProgressChan chan<- types.TipProgressEvent
+	TipProgressChan chan<- *types.TipProgressEvent
 	TipLog          slog.Logger
 
-	TipReceivedChan chan<- types.ReceivedTip
+	TipReceivedChan chan<- *types.ReceivedTip
 	TipReceivedLog  slog.Logger
 
-	KXChan chan<- types.KXCompleted
+	KXChan chan<- *types.KXCompleted
 	KXLog  slog.Logger
 
 	RPCUser string

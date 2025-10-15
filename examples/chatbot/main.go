@@ -29,7 +29,7 @@ func realMain() error {
 	}
 
 	// Create a bidirectional channel
-	pmChan := make(chan types.ReceivedPM)
+	pmChan := make(chan *types.ReceivedPM)
 	// Assign the send side to the config
 	cfg.PMChan = pmChan
 	// Note: PMLog will be created internally by NewBot

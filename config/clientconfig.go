@@ -16,6 +16,8 @@ var (
 
 // ClientConfig holds all configuration options for a Bison Relay client
 type ClientConfig struct {
+	DataDir string
+
 	RPCURL          string
 	BRClientCert    string
 	BRClientRPCCert string

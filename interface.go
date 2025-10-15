@@ -27,26 +27,26 @@ type Bot struct {
 	wlMtx  sync.Mutex
 
 	gcLog      slog.Logger
-	gcChan     chan<- types.GCReceivedMsg
-	inviteChan chan<- types.ReceivedGCInvite
+	gcChan     chan<- *types.GCReceivedMsg
+	inviteChan chan<- *types.ReceivedGCInvite
 
 	pmLog  slog.Logger
-	pmChan chan<- types.ReceivedPM
+	pmChan chan<- *types.ReceivedPM
 
 	postLog  slog.Logger
-	postChan chan<- types.ReceivedPost
+	postChan chan<- *types.ReceivedPost
 
 	postStatusLog  slog.Logger
-	postStatusChan chan<- types.ReceivedPostStatus
+	postStatusChan chan<- *types.ReceivedPostStatus
 
 	tipProgressLog  slog.Logger
-	tipProgressChan chan<- types.TipProgressEvent
+	tipProgressChan chan<- *types.TipProgressEvent
 
 	tipReceivedLog  slog.Logger
-	tipReceivedChan chan<- types.ReceivedTip
+	tipReceivedChan chan<- *types.ReceivedTip
 
 	kxLog  slog.Logger
-	kxChan chan<- types.KXCompleted
+	kxChan chan<- *types.KXCompleted
 
 	chatService    types.ChatServiceClient
 	gcService      types.GCServiceClient

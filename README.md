@@ -56,7 +56,7 @@ func main() {
 	log := logBackend.Logger("Bot")
 
 	// Create channels for handling messages (if needed)
-	pmChan := make(chan types.ReceivedPM)
+  pmChan := make(chan *types.ReceivedPM)
 	// Assign the channel to the config
 	cfg.PMChan = pmChan
 	cfg.PMLog = logBackend.Logger("PM")

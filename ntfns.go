@@ -43,7 +43,7 @@ func (b *Bot) gcNtfns(ctx context.Context) error {
 				b.gcLog.Errorf("failed to acknowledge received gc: %v", err)
 				break
 			}
-			b.gcChan <- pm
+			b.gcChan <- &pm
 		}
 	}
 }
@@ -83,7 +83,7 @@ func (b *Bot) inviteNtfns(ctx context.Context) error {
 				b.gcLog.Errorf("failed to acknowledge kx: %v", err)
 				break
 			}
-			b.inviteChan <- pm
+			b.inviteChan <- &pm
 		}
 	}
 }
@@ -121,7 +121,7 @@ func (b *Bot) kxNtfns(ctx context.Context) error {
 				b.kxLog.Errorf("failed to acknowledge kx: %v", err)
 				break
 			}
-			b.kxChan <- pm
+			b.kxChan <- &pm
 		}
 	}
 }
@@ -161,7 +161,7 @@ func (b *Bot) pmNtfns(ctx context.Context) error {
 				b.pmLog.Errorf("failed to acknowledge received gc: %v", err)
 				break
 			}
-			b.pmChan <- pm
+			b.pmChan <- &pm
 		}
 	}
 }
@@ -199,7 +199,7 @@ func (b *Bot) postNtfns(ctx context.Context) error {
 				b.postLog.Errorf("failed to acknowledge post: %v", err)
 				break
 			}
-			b.postChan <- pm
+			b.postChan <- &pm
 		}
 	}
 }
@@ -237,7 +237,7 @@ func (b *Bot) postStatusNtfns(ctx context.Context) error {
 				b.postStatusLog.Errorf("Failed to acknowledge post status: %v", err)
 				break
 			}
-			b.postStatusChan <- pm
+			b.postStatusChan <- &pm
 		}
 	}
 }
@@ -267,7 +267,7 @@ func (b *Bot) tipProgress(ctx context.Context) error {
 				b.tipProgressLog.Warnf("Error while receiving stream: %v", err)
 				break
 			}
-			b.tipProgressChan <- pm
+			b.tipProgressChan <- &pm
 		}
 	}
 }
@@ -297,7 +297,7 @@ func (b *Bot) tipReceived(ctx context.Context) error {
 				b.tipReceivedLog.Warnf("Error while receiving stream: %v", err)
 				break
 			}
-			b.tipReceivedChan <- tip
+			b.tipReceivedChan <- &tip
 		}
 	}
 }
