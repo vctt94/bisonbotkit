@@ -182,8 +182,9 @@ func NewBot(cfg *config.BotConfig) (*Bot, error) {
 		cfg:        cfg,
 		LogBackend: logBackend,
 
-		wsc: wsc,
-		ctx: ctx,
+		wsc:       wsc,
+		ctx:       ctx,
+		cancelCtx: cancel,
 
 		gcChan:     cfg.GCChan,
 		gcLog:      cfg.GCLog,
