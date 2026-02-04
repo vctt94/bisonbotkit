@@ -19,8 +19,9 @@ type Bot struct {
 
 	LogBackend *logging.LogBackend
 
-	wsc *jsonrpc.WSClient
-	ctx context.Context
+	wsc       *jsonrpc.WSClient
+	ctx       context.Context
+	cancelCtx context.CancelFunc
 
 	wl     map[string]int64
 	wlFile string
@@ -70,6 +71,9 @@ func (g GCs) Swap(a, b int) {
 }
 
 func (b *Bot) Close() error {
+	if b.cancelCtx != nil {
+		b.cancelCtx()
+	}
 	if b.LogBackend != nil {
 		err := b.LogBackend.Close()
 		if err != nil {
